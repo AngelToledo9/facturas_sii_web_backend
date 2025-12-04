@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Facturas SII - Escaneo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+        }
+        .card {
+            background: #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            font-family: monospace;
+        }
+        label {
+            font-weight: bold;
+        }
+
+        button, a.boton {
+            display: inline-block;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #3b82f6;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        a.boton:hover, button:hover {
+            background: #2563eb;
+        }
+
+        /* Botones verdes */
+        .boton-verde {
+            background: #10b981;
+        }
+        .boton-verde:hover {
+            background: #059669;
+        }
+
+        /* BOTÓN ROJO +++ */
+        .boton-rojo {
+            background: #dc2626 !important;    /* rojo más fuerte */
+            color: white !important;
+            font-weight: bold;
+        }
+        .boton-rojo:hover {
+            background: #b91c1c !important;    /* rojo oscuro al pasar mouse */
+        }
+
+        /* Barra contenedora del botón de cierre de sesión */
+        .logout-bar {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+        }
+
+        /* Fila de botones principales */
+        .fila-botones {
+            display: flex;
+            align-items: center;
+            margin-top: 12px;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .grupo-izq {
+            display: flex;
+            gap: 8px;
+        }
+
+        .grupo-der {
+            display: flex;
+            gap: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background: #e5e7eb;
+        }
+
+        .error {
+            color: #b91c1c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CERRAR SESIÓN - SOLO EN ESTA PANTALLA -->
+    <div class="logout-bar">
+        <a href="/logout" class="boton boton-rojo" style="padding:10px 20px;">Cerrar sesión</a>
+    </div>
+
+    <h1>Sistema de Lectura de Facturas SII</h1>
+
+    <div class="card">
+        <h2>Escanear / pegar código de barra</h2>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <form action="/escanear" method="post">
+            <label for="codigo_barra">Código de barra (lector físico o copiar/pegar):</label><br>
+            <textarea id="codigo_barra" name="codigo_barra" autofocus>{{ codigo_barra or '' }}</textarea><br>
+
+            <div class="fila-botones">
+                <div class="grupo-izq">
+                    <button type="submit">Validar y guardar</button>
+                    <a href="/listado" class="boton boton-verde">Ir al listado de facturas</a>
+                </div>
+
+                <div class="grupo-der">
+                    {% if usuario and usuario.rol == 'ADMIN' %}
+                    <a href="/admin/usuarios" class="boton">Administrar usuarios</a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if factura %}
+    <div class="card">
+        <h2>Resultado de la factura</h2>
+        <table>
+            <tr><th>ID interno</th><td>{{ factura.id }}</td></tr>
+            <tr><th>RUT Emisor</th><td>{{ factura.rut_emisor }}</td></tr>
+            <tr><th>RUT Receptor</th><td>{{ factura.rut_receptor }}</td></tr>
+            <tr><th>Tipo documento</th><td>{{ factura.tipo_documento }}</td></tr>
+            <tr><th>Folio</th><td>{{ factura.folio }}</td></tr>
+            <tr><th>Fecha emisión</th><td>{{ factura.fecha_emision }}</td></tr>
+            <tr><th>Monto total</th><td>{{ factura.monto_total }}</td></tr>
+            <tr><th>Estado</th><td>{{ factura.estado }}</td></tr>
+            <tr><th>Fecha registro</th><td>{{ factura.fecha_registro }}</td></tr>
+        </table>
+    </div>
+    {% endif %}
+</body>
+</html>

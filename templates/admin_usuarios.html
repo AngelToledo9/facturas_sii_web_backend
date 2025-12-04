@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Administración de usuarios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .user-info {
+            font-size: 14px;
+            color: #374151;
+        }
+        .user-info span {
+            font-weight: bold;
+        }
+        .nav-links a {
+            margin-right: 8px;
+            padding: 6px 10px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            text-decoration: none;
+            color: #111827;
+            font-size: 14px;
+        }
+        .nav-links a:hover {
+            background: #d1d5db;
+        }
+        .card {
+            background: #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 14px;
+        }
+        th {
+            background: #e5e7eb;
+            text-align: left;
+        }
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 4px;
+            background: #3b82f6;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #2563eb;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+        .badge-admin {
+            background: #f97316;
+            color: #fff;
+        }
+        .badge-contador {
+            background: #0ea5e9;
+            color: #fff;
+        }
+        .badge-usuario {
+            background: #6b7280;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Administración de usuarios</h1>
+
+    <div class="top-bar">
+        <div class="nav-links">
+            <a href="/">Escanear</a>
+            <a href="/listado">Listado</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/admin/usuarios">Usuarios</a>
+            <a href="/logout">Cerrar sesión</a>
+        </div>
+        <div class="user-info">
+            Sesión: <span>{{ usuario.username }}</span> ({{ usuario.rol }})
+        </div>
+    </div>
+
+    <div class="card">
+        <a href="/admin/usuarios/nuevo" class="btn">➕ Crear usuario</a>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Activo</th>
+                <th>Permisos</th>
+                <th>Acciones</th>
+            </tr>
+            {% for u in usuarios %}
+            <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.username }}</td>
+                <td>
+                    {% if u.rol == 'ADMIN' %}
+                        <span class="badge badge-admin">ADMIN</span>
+                    {% elif u.rol == 'CONTADOR' %}
+                        <span class="badge badge-contador">CONTADOR</span>
+                    {% else %}
+                        <span class="badge badge-usuario">USUARIO</span>
+                    {% endif %}
+                </td>
+                <td>{{ 'Sí' if u.activo else 'No' }}</td>
+                <td>
+                    {% if u.puede_escanear %}<span class="badge">Escanear</span>{% endif %}
+                    {% if u.puede_ver_listado %}<span class="badge">Listado</span>{% endif %}
+                    {% if u.puede_ver_dashboard %}<span class="badge">Dashboard</span>{% endif %}
+                    {% if u.puede_exportar %}<span class="badge">Exportar</span>{% endif %}
+                    {% if u.puede_gestionar_usuarios %}<span class="badge">Admin usuarios</span>{% endif %}
+                </td>
+                <td>
+                    <a href="/admin/usuarios/{{ u.id }}/editar">Editar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

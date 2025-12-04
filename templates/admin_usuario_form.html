@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if modo == 'nuevo' %}Nuevo usuario{% else %}Editar usuario{% endif %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 20px auto;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .nav-links a {
+            margin-right: 8px;
+            padding: 6px 10px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            text-decoration: none;
+            color: #111827;
+            font-size: 14px;
+        }
+        .nav-links a:hover {
+            background: #d1d5db;
+        }
+        .user-info {
+            font-size: 14px;
+            color: #374151;
+        }
+        .user-info span {
+            font-weight: bold;
+        }
+        .card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 6px;
+            box-sizing: border-box;
+            margin-top: 3px;
+        }
+        .checkbox-group {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f3f4f6;
+            border-radius: 6px;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            display: block;
+            margin-bottom: 4px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #3b82f6;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        .link-back {
+            margin-left: 10px;
+            font-size: 14px;
+        }
+        .link-back a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .link-back a:hover {
+            text-decoration: underline;
+        }
+        small {
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <h1>{% if modo == 'nuevo' %}Nuevo usuario{% else %}Editar usuario{% endif %}</h1>
+
+    <div class="top-bar">
+        <div class="nav-links">
+            <a href="/">Escanear</a>
+            <a href="/listado">Listado</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/admin/usuarios">Usuarios</a>
+            <a href="/logout">Cerrar sesión</a>
+        </div>
+        <div class="user-info">
+            Sesión: <span>{{ usuario.username }}</span> ({{ usuario.rol }})
+        </div>
+    </div>
+
+    <div class="card">
+        <form method="post" action="/admin/usuarios/guardar">
+            {% if usuario_obj %}
+                <input type="hidden" name="id" value="{{ usuario_obj.id }}">
+            {% endif %}
+
+            <label>Usuario:</label>
+            <input type="text" name="username" value="{{ usuario_obj.username if usuario_obj else '' }}" required>
+
+            <label>Contraseña:</label>
+            <input type="password" name="password" {% if modo == 'nuevo' %}required{% endif %}>
+            {% if modo == 'editar' %}
+                <small>Déjala vacía si no quieres cambiarla.</small>
+            {% endif %}
+
+            <label>Rol:</label>
+            {% set rol_actual = usuario_obj.rol if usuario_obj else 'USUARIO' %}
+            <select name="rol">
+                <option value="ADMIN" {{ 'selected' if rol_actual == 'ADMIN' else '' }}>Administrador</option>
+                <option value="CONTADOR" {{ 'selected' if rol_actual == 'CONTADOR' else '' }}>Contador</option>
+                <option value="USUARIO" {{ 'selected' if rol_actual == 'USUARIO' else '' }}>Usuario normal</option>
+            </select>
+
+            <div class="checkbox-group">
+                <strong>Permisos:</strong>
+                {% set u = usuario_obj %}
+                <label>
+                    <input type="checkbox" name="puede_escanear"
+                        {{ 'checked' if (u and u.puede_escanear) or (not u) else '' }}>
+                    Puede escanear facturas
+                </label>
+                <label>
+                    <input type="checkbox" name="puede_ver_listado"
+                        {{ 'checked' if u and u.puede_ver_listado else '' }}>
+                    Ver listado de facturas
+                </label>
+                <label>
+                    <input type="checkbox" name="puede_ver_dashboard"
+                        {{ 'checked' if u and u.puede_ver_dashboard else '' }}>
+                    Ver dashboard
+                </label>
+                <label>
+                    <input type="checkbox" name="puede_exportar"
+                        {{ 'checked' if u and u.puede_exportar else '' }}>
+                    Exportar CSV
+                </label>
+                <label>
+                    <input type="checkbox" name="puede_gestionar_usuarios"
+                        {{ 'checked' if u and u.puede_gestionar_usuarios else '' }}>
+                    Administrar usuarios
+                </label>
+                <label>
+                    <input type="checkbox" name="activo"
+                        {{ 'checked' if (not u) or (u and u.activo) else '' }}>
+                    Usuario activo
+                </label>
+            </div>
+
+            <button type="submit">Guardar</button>
+            <span class="link-back"><a href="/admin/usuarios">Cancelar</a></span>
+        </form>
+    </div>
+</body>
+</html>

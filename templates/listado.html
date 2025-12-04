@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Facturas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1100px;
+            margin: 20px auto;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+        }
+        .card {
+            background: #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Botones */
+        .top-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            color: #fff;
+        }
+        .btn-verde {
+            background: #10b981;
+        }
+        .btn-verde:hover {
+            background: #059669;
+        }
+        .btn-morado {
+            background: #6366f1;
+        }
+        .btn-morado:hover {
+            background: #4f46e5;
+        }
+        .btn-amarillo {
+            background: #f59e0b;
+        }
+        .btn-amarillo:hover {
+            background: #d97706;
+        }
+
+        /* Filtros */
+        label {
+            font-weight: bold;
+            font-size: 13px;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            font-size: 13px;
+        }
+
+        /* --- AJUSTE FINAL: Filtros amplios en 3 columnas --- */
+        .filtros-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px 20px;
+            margin-top: 15px;
+            align-items: end;
+        }
+
+        .btn-aplicar {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 12px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+        }
+        .btn-aplicar:hover {
+            background: #2563eb;
+        }
+
+        /* Tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+        th {
+            background: #e5e7eb;
+        }
+        a.link {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        a.link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Listado de Facturas</h1>
+
+    <!-- BOTONES SUPERIORES -->
+    <div class="top-buttons">
+        <a href="/" class="btn btn-verde">Volver a escanear</a>
+
+        {% if usuario and usuario.rol in ['ADMIN', 'CONTADOR'] %}
+        <a href="/dashboard" class="btn btn-morado">Ir al dashboard</a>
+        <a href="/exportar_csv" class="btn btn-amarillo">Exportar CSV</a>
+        {% endif %}
+    </div>
+
+    <!-- CARD FILTROS -->
+    <div class="card">
+        <h2>Filtros</h2>
+
+        <form method="get" action="/listado">
+            <div class="filtros-grid">
+
+                <div>
+                    <label>RUT emisor:</label>
+                    <input type="text" name="rut" value="{{ rut or '' }}">
+                </div>
+
+                <div>
+                    <label>Folio:</label>
+                    <input type="text" name="folio" value="{{ folio or '' }}">
+                </div>
+
+                <div>
+                    <label>Texto (código / nota interna):</label>
+                    <input type="text" name="texto" value="{{ texto or '' }}">
+                </div>
+
+                <div>
+                    <label>Monto mínimo:</label>
+                    <input type="text" name="monto_min" value="{{ monto_min or '' }}">
+                </div>
+
+                <div>
+                    <label>Monto máximo:</label>
+                    <input type="text" name="monto_max" value="{{ monto_max or '' }}">
+                </div>
+
+                <div>
+                    <label>Fecha desde:</label>
+                    <input type="date" name="fecha_desde" value="{{ fecha_desde or '' }}">
+                </div>
+
+                <div>
+                    <label>Fecha hasta:</label>
+                    <input type="date" name="fecha_hasta" value="{{ fecha_hasta or '' }}">
+                </div>
+
+                <div>
+                    <button type="submit" class="btn-aplicar">Aplicar filtros</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <!-- CARD TABLA -->
+    <div class="card">
+        <h2>Facturas registradas</h2>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>RUT Emisor</th>
+                <th>RUT Receptor</th>
+                <th>Folio</th>
+                <th>Fecha</th>
+                <th>Monto</th>
+                <th>Detalle</th>
+            </tr>
+
+            {% for f in facturas %}
+            <tr>
+                <td>{{ f.id }}</td>
+                <td>{{ f.rut_emisor }}</td>
+                <td>{{ f.rut_receptor }}</td>
+                <td>{{ f.folio }}</td>
+                <td>{{ f.fecha_emision }}</td>
+                <td>{{ f.monto_total }}</td>
+                <td><a href="/factura/{{ f.id }}" class="link">Ver</a></td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+
+</body>
+</html>

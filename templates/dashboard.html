@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Facturas SII</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1100px;
+            margin: 20px auto;
+            background: #f5f5f5;
+        }
+        h1 { text-align: center; }
+        .card {
+            background: #ffffff;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .resumen {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .resumen-item {
+            flex: 1 1 200px;
+            background: #eff6ff;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .resumen-item h3 {
+            margin: 0 0 5px 0;
+        }
+        .resumen-item p {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    <!-- Chart.js desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Dashboard de Facturación SII</h1>
+
+    <div class="card">
+        <h2>Resumen general</h2>
+        <div class="resumen">
+            <div class="resumen-item">
+                <h3>Total facturado</h3>
+                <p>${{ total_general }}</p>
+            </div>
+            <div class="resumen-item">
+                <h3>Cantidad de facturas</h3>
+                <p>{{ cantidad_facturas }}</p>
+            </div>
+            <div class="resumen-item">
+                <h3>Promedio por factura</h3>
+                <p>
+                    {% if cantidad_facturas > 0 %}
+                        ${{ (total_general / cantidad_facturas)|round(0) }}
+                    {% else %}
+                        $0
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        <p>
+            <a href="/">Ir a Escanear</a> |
+            <a href="/listado">Ir a Listado</a>
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>Facturación por mes</h2>
+        <canvas id="chartMes"></canvas>
+    </div>
+
+    <div class="card">
+        <h2>Top 5 emisores por monto facturado</h2>
+        <canvas id="chartEmisor"></canvas>
+    </div>
+
+    <script>
+        // Datos para gráfico por mes
+        const labelsMes = JSON.parse('{{ labels_mes | tojson | safe }}');
+        const dataMes = JSON.parse('{{ values_mes | tojson | safe }}');
+
+        const ctxMes = document.getElementById('chartMes').getContext('2d');
+        new Chart(ctxMes, {
+            type: 'bar',
+            data: {
+                labels: labelsMes,
+                datasets: [{
+                    label: 'Monto total por mes',
+                    data: dataMes
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Datos para gráfico por emisor
+        const labelsEmisor = JSON.parse('{{ labels_emisor | tojson | safe }}');
+        const dataEmisor = JSON.parse('{{ values_emisor | tojson | safe }}');
+
+        const ctxEmisor = document.getElementById('chartEmisor').getContext('2d');
+        new Chart(ctxEmisor, {
+            type: 'pie',
+            data: {
+                labels: labelsEmisor,
+                datasets: [{
+                    label: 'Monto total por emisor',
+                    data: dataEmisor
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+</body>
+</html>

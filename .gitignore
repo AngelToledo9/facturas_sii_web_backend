@@ -1,0 +1,24 @@
+# Entorno virtual
+venv/
+ENV/
+.env/
+
+# Base de datos local
+facturas.db
+
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Configuración de editor
+.vscode/
+.idea/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
